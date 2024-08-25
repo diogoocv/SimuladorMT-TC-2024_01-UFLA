@@ -3,6 +3,9 @@
 
 using namespace std;
 
+// Número de iterações da MT para considerar que talvez haja um loop infinito
+#define LOOP 2000
+
 // Um estado pode ser não final, ou ser um estado final de aceitação ou rejeição
 enum EstadoFinal
 {
@@ -17,20 +20,28 @@ struct estado
     string nome;             // Nome do estado
     bool estadoInicial;      // Indica se um estado é ou não inicial
     EstadoFinal estadoFinal; // Indica se um estado não é final, ou se é final de aceitação ou rejeição
+
+    // Sobrecarga do operador == para comparar dois estados
+    bool operator==(const estado &other) const
+    {
+        return nome == other.nome &&
+               estadoInicial == other.estadoInicial &&
+               estadoFinal == other.estadoFinal;
+    }
 };
 
 // Representa uma transição da função de transição (δ) da MT
 struct transicao
 {
-    string estadoOrigem;  // Nome do estado de origem da transição
+    estado estadoOrigem;  // Estado de origem da transição
     string simboloLido;   // Simbolo lido pela cabeça de leitura
-    string estadoDestino; // Nome do estado de destino
+    estado estadoDestino; // Estado de destino da transição
     string novoSimbolo;   // Simbolo a ser escrito na fita
     char direcao;         // Direcao para a qual a cabeça de leitura e escrita será movida (E ou D)
 };
 
 // Verifica se uma transição é válida (estados pertencem ao conjunto de estados da MT e símbolos pertencem ao alfabeto da fita)
-bool transicaoValida(pair<estado*, int> *estados, string **alfabetoFita, int qtdSimbolosFita, string estado, string simbolo, char direcao)
+bool transicaoValida(pair<estado *, int> *estados, string **alfabetoFita, int qtdSimbolosFita, string estado, string simbolo, char direcao)
 {
     // Verificando se o estado é válido
     bool estadoValido = false;
@@ -75,8 +86,24 @@ bool transicaoValida(pair<estado*, int> *estados, string **alfabetoFita, int qtd
     return false;
 }
 
+// Encontra um estado a partir de seu nome e o retorna
+estado encontrarEstado(pair<estado *, int> estados, string nomeEstado)
+{
+    estado est;
+
+    for (int i = 0; i < estados.second; i++)
+    {
+        if (estados.first[i].nome == nomeEstado)
+        {
+            est = estados.first[i];
+        }
+    }
+
+    return est;
+}
+
 // Lê as informações da Máquina de Turing a ser simulada
-void lerMT(pair<estado*, int> *estados, string **alfabeto, string **alfabetoFita, transicao **funcaoTransicao, vector<string> *fita, string &branco)
+void lerMT(pair<estado *, int> *estados, string **alfabeto, string **alfabetoFita, pair<transicao *, int> *funcaoTransicao, pair<vector<string> *, int> *fita, string &branco)
 {
     int qtdEstados = 0;         // Número de estados da MT
     int qtdSimbolosEntrada = 0; // Número de símbolos do alfabeto de entrada
@@ -264,7 +291,8 @@ void lerMT(pair<estado*, int> *estados, string **alfabeto, string **alfabetoFita
     if (qtdEstados > 2)
     {
         int qtdTransicoes = (qtdEstados - 2) * qtdSimbolosFita;
-        *funcaoTransicao = new transicao[qtdTransicoes];
+        funcaoTransicao->first = new transicao[qtdTransicoes];
+        funcaoTransicao->second = qtdTransicoes;
 
         // Lendo a função de transição completa da MT
         int contTransicao = 0;
@@ -275,33 +303,35 @@ void lerMT(pair<estado*, int> *estados, string **alfabeto, string **alfabetoFita
             {
                 while (true)
                 {
-                    string estadoOrigem;  // Nome do estado de origem da transição
-                    string simboloLido;   // Simbolo lido pela cabeça de leitura
-                    string estadoDestino; // Nome do estado de destino
-                    string novoSimbolo;   // Símbolo a ser escrito na fita
-                    char direcao;         // Direcao para a qual a cabeça de leitura/escrita será movida (E ou D)
+                    estado estadoOrigem; // Nome do estado de origem da transição
+                    string simboloLido;  // Simbolo lido pela cabeça de leitura
+                    string nomeDestino;  // Nome do estado de destino
+                    string novoSimbolo;  // Símbolo a ser escrito na fita
+                    char direcao;        // Direcao para a qual a cabeça de leitura/escrita será movida (E ou D)
 
                     // Lendo a transição para o estado e símbolo atuais
-                    estadoOrigem = estados->first[i].nome;
+                    estadoOrigem = estados->first[i];
                     simboloLido = (*alfabetoFita)[j];
-                    cout << "(" << estadoOrigem << ", " << simboloLido << ") -> ";
-                    cin >> estadoDestino >> novoSimbolo >> direcao;
+                    cout << "(" << estadoOrigem.nome << ", " << simboloLido << ") -> ";
+                    cin >> nomeDestino >> novoSimbolo >> direcao;
 
                     // Verificando se a transição é válida e atribuindo ela ao vetor da função de transição
-                    if (transicaoValida(estados, alfabetoFita, qtdSimbolosFita, estadoDestino, novoSimbolo, direcao))
+                    if (transicaoValida(estados, alfabetoFita, qtdSimbolosFita, nomeDestino, novoSimbolo, direcao))
                     {
-                        (*funcaoTransicao)[contTransicao].estadoOrigem = estadoOrigem;
-                        (*funcaoTransicao)[contTransicao].simboloLido = simboloLido;
-                        (*funcaoTransicao)[contTransicao].estadoDestino = estadoDestino;
-                        (*funcaoTransicao)[contTransicao].novoSimbolo = novoSimbolo;
-                        (*funcaoTransicao)[contTransicao].direcao = direcao;
+                        estado estadoDestino = encontrarEstado(*estados, nomeDestino);
+
+                        funcaoTransicao->first[contTransicao].estadoOrigem = estadoOrigem;
+                        funcaoTransicao->first[contTransicao].simboloLido = simboloLido;
+                        funcaoTransicao->first[contTransicao].estadoDestino = estadoDestino;
+                        funcaoTransicao->first[contTransicao].novoSimbolo = novoSimbolo;
+                        funcaoTransicao->first[contTransicao].direcao = direcao;
                         contTransicao++;
 
                         break;
                     }
 
                     cout << "Transicao invalida! Verifique os estados, simbolos e direcao informados." << endl;
-                }   
+                }
             }
         }
     }
@@ -314,37 +344,184 @@ void lerMT(pair<estado*, int> *estados, string **alfabeto, string **alfabetoFita
     // Lendo cada um dos símbolos da fita de entrada
     if (tamanhoEntrada > 0)
     {
+        fita->second = tamanhoEntrada + 1; // Tamanho da fita é, inicialmente, o tamanho da entrada + 1 (caractere branco no final)
         cout << "Digite cada um dos simbolos da fita de entrada: ";
         for (int i = 0; i < tamanhoEntrada; i++)
         {
             string entrada;
             cin >> entrada;
-            fita->push_back(entrada);
+            fita->first->push_back(entrada);
         }
     }
-    fita->push_back(branco); // Adicionando o símbolo branco ao final da fita
+    fita->first->push_back(branco); // Adicionando o símbolo branco ao final da fita
 }
 
+// Simula uma MT
+int simularMT(pair<estado *, int> *estados, string *alfabeto, string *alfabetoFita, pair<transicao *, int> *fTransicao, pair<vector<string> *, int> *fita, string branco)
+{
+    estado estadoAtual;    // Estado no qual será verificada a função de transição na iteração atual da MT
+    int posFita = 0;       // Posição da cabeça de leitura/escrita na fita
+    int contIteracoes = 0; // Contador de iteracoes da MT para identificar um possivel loop infinito
+
+    // Atribuindo o estado inicial da MT ao estadoAtual
+    for (int i = 0; i < estados->second; i++)
+    {
+        if (estados->first[i].estadoInicial)
+        {
+            estadoAtual = estados->first[i];
+        }
+    }
+
+    while (true)
+    {
+        // Verificando se o estado atual não é final
+        if (estadoAtual.estadoFinal == NAO_FINAL)
+        {
+            bool transicaoEncontrada = false;
+            string simboloLido = (*fita->first)[posFita]; // Lendo o símbolo apontado pela cabeça de leitura/escrita
+
+            // Verificando se existe uma transição do estado atual lendo o símbolo apontado pela cabeça de leitura/escrita
+            for (int i = 0; i < fTransicao->second; i++)
+            {
+                if (fTransicao->first[i].estadoOrigem == estadoAtual)
+                {
+                    if (fTransicao->first[i].simboloLido == simboloLido)
+                    {
+                        estadoAtual = fTransicao->first[i].estadoDestino;           // Indo para o estado de destino da transição
+                        (*fita->first)[posFita] = fTransicao->first[i].novoSimbolo; // Escrevendo na fita o novo símbolo da transição
+
+                        // Atualizando a posição da cabeça de leitura e escrita
+                        // Movendo para a direita
+                        if (fTransicao->first[i].direcao == 'D')
+                        {
+                            // Verificando se a Ccbeça de leitura/escrita será posicionada na última posição da fita
+                            if (posFita >= (*fita).second - 1)
+                            {
+                                (*fita->first).push_back(branco); // Adicionando um símbolo branco ao final da fita
+                                (*fita).second++;                 // Incrementando o tamanho da fita
+                            }
+
+                            posFita++; // Posicionando a cabeça de l/e uma posição à direita
+                        }
+                        // Tentando mover para a esquerda
+                        else
+                        {
+                            // Verificando se a posição não é a primeira da fita
+                            if(posFita > 0) {
+                                posFita--;  // Posicionando a cabeça de l/e uma posição à esquerda
+                            }
+                            // Cabeça de l/e posicionada na primeira posição da fita
+                            else
+                            {
+                                continue;   // Não é possível mover para a esquerda, a cabeça de l/e permanece na mesma posição
+                            }   
+                        }
+
+                        transicaoEncontrada = true;
+                        i = fTransicao->second;
+                    }
+                }
+            }
+
+            if (!transicaoEncontrada)
+            {
+                return 0; // Palavra rejeitada pela MT
+            }
+        }
+        else
+        {
+            if (estadoAtual.estadoFinal == ACEITACAO)
+            {
+                return 1; // Palavra aceita pela MT
+            }
+            else
+            {
+                return 0; // Palavra rejeitada pela MT
+            }
+        }
+
+        // Verificando se a maquina entrou em um possível loop
+        if (contIteracoes > LOOP)
+        {
+            char op;
+            cout << "A maquina de Turing pode ter entrado em loop. Deseja continuou? (S / N)";
+            cin >> op;
+
+            if (op != 's' and op != 'S')
+            {
+                return -1; // Execução da MT finalizada devido a um possível loop
+            }
+            else
+            {
+                contIteracoes = 0; // Reiniciando o contador de iterações
+            }
+        }
+        contIteracoes++;
+    }
+}
+
+// Imprime o conteúdo da fita
+void imprimirFita(pair<vector<string>*, int> fita)
+{
+    for(int i = 0; i < fita.second; i++)
+    {
+        cout << (*fita.first)[i] << " ";
+    }
+}
 
 int main()
 {
     cout << "Iniciado" << endl;
-    pair<estado*, int> estados;                // Par com o conjunto de estados (Q) e o seu tamanho (|Q|)
-    string *alfabeto;                          // Alfabeto de entrada (∑)
-    string *alfabetoFita;                      // Alfabeto da fita (Γ)
-    transicao *fTransicao;                     // Função de transição (δ)
-    vector<string> *fita = new vector<string>; // Fita de entrada
-    string branco;                             // Símbolo branco (_)
+    pair<estado *, int> estados;       // Par com o conjunto de estados (Q) e o seu tamanho (|Q|)
+    string *alfabeto;                  // Alfabeto de entrada (∑)
+    string *alfabetoFita;              // Alfabeto da fita (Γ)
+    pair<transicao *, int> fTransicao; // Função de transição (δ) e o seu tamanho
+    pair<vector<string> *, int> fita;  // Par com a fita de entrada e o seu tamanho
+    string branco;                     // Símbolo branco (_)
+
+    fita.first = new vector<string>; // Inicializando a fita
 
     cout << "Simulador de Maquina de Turing Universal" << endl;
-    lerMT(&estados, &alfabeto, &alfabetoFita, &fTransicao, fita, branco);
+    lerMT(&estados, &alfabeto, &alfabetoFita, &fTransicao, &fita, branco);
 
-   
+    int result = simularMT(&estados, alfabeto, alfabetoFita, &fTransicao, &fita, branco);
+    
+    switch (result)
+    {
+        case 1:
+        {
+            cout << "Palavra aceita (pertence a linguagem da MT)" << endl;
+            cout << "Fita ao final da execucao: ";
+            imprimirFita(fita);
+            break;
+        }
+
+        case 0:
+        {
+            cout << "Palavra rejeitada (nao pertence a linguagem da MT)" << endl;
+            cout << "Fita ao final da execucao: ";
+            imprimirFita(fita);
+            break;
+        }
+        
+        case -1:
+        {
+            cout << "A maquina entrou em um possivel loop. Nao foi possivel retornar um resultado" << endl;
+            break;
+        }
+
+        default:
+        {
+            cout << "Erro na execucao!!" << endl;
+            break;
+        }
+    }
+
     delete[] estados.first;
     delete[] alfabeto;
     delete[] alfabetoFita;
-    delete[] fTransicao;
-    delete[] fita;
+    delete[] fTransicao.first;
+    delete[] fita.first;
 
     return 0;
 }
