@@ -103,7 +103,7 @@ estado encontrarEstado(pair<estado *, int> estados, string nomeEstado)
 }
 
 // Lê as informações da Máquina de Turing a ser simulada
-void lerMT(pair<estado *, int> *estados, string **alfabeto, string **alfabetoFita, pair<transicao *, int> *funcaoTransicao, pair<vector<string> *, int> *fita, string &branco)
+void lerMT(pair<estado *, int> *estados, string **alfabeto, string **alfabetoFita, pair<transicao *, int> *funcaoTransicao, string &branco)
 {
     int qtdEstados = 0;         // Número de estados da MT
     int qtdSimbolosEntrada = 0; // Número de símbolos do alfabeto de entrada
@@ -335,7 +335,11 @@ void lerMT(pair<estado *, int> *estados, string **alfabeto, string **alfabetoFit
             }
         }
     }
+}
 
+// Lê a fita de entrada da MT
+void lerFita(pair<vector<string> *, int> *fita, string branco)
+{
     // Lendo a fita de entrada
     int tamanhoEntrada = 0;
     cout << "Digite o tamanho (quantidade de simbolos) da fita de entrada: ";
@@ -357,7 +361,7 @@ void lerMT(pair<estado *, int> *estados, string **alfabeto, string **alfabetoFit
 }
 
 // Simula uma MT
-int simularMT(pair<estado *, int> *estados, string *alfabeto, string *alfabetoFita, pair<transicao *, int> *fTransicao, pair<vector<string> *, int> *fita, string branco)
+int simularMT(pair<estado *, int> *estados, pair<transicao *, int> *fTransicao, pair<vector<string> *, int> *fita, string branco)
 {
     estado estadoAtual;    // Estado no qual será verificada a função de transição na iteração atual da MT
     int posFita = 0;       // Posição da cabeça de leitura/escrita na fita
@@ -407,14 +411,15 @@ int simularMT(pair<estado *, int> *estados, string *alfabeto, string *alfabetoFi
                         else
                         {
                             // Verificando se a posição não é a primeira da fita
-                            if(posFita > 0) {
-                                posFita--;  // Posicionando a cabeça de l/e uma posição à esquerda
+                            if (posFita > 0)
+                            {
+                                posFita--; // Posicionando a cabeça de l/e uma posição à esquerda
                             }
                             // Cabeça de l/e posicionada na primeira posição da fita
                             else
                             {
-                                continue;   // Não é possível mover para a esquerda, a cabeça de l/e permanece na mesma posição
-                            }   
+                                continue; // Não é possível mover para a esquerda, a cabeça de l/e permanece na mesma posição
+                            }
                         }
 
                         transicaoEncontrada = true;
@@ -461,9 +466,9 @@ int simularMT(pair<estado *, int> *estados, string *alfabeto, string *alfabetoFi
 }
 
 // Imprime o conteúdo da fita
-void imprimirFita(pair<vector<string>*, int> fita)
+void imprimirFita(pair<vector<string> *, int> fita)
 {
-    for(int i = 0; i < fita.second; i++)
+    for (int i = 0; i < fita.second; i++)
     {
         cout << (*fita.first)[i] << " ";
     }
@@ -482,39 +487,40 @@ int main()
     fita.first = new vector<string>; // Inicializando a fita
 
     cout << "Simulador de Maquina de Turing Universal" << endl;
-    lerMT(&estados, &alfabeto, &alfabetoFita, &fTransicao, &fita, branco);
 
-    int result = simularMT(&estados, alfabeto, alfabetoFita, &fTransicao, &fita, branco);
-    
+    lerMT(&estados, &alfabeto, &alfabetoFita, &fTransicao, branco); // Lendo a Máquina de Turing Específica (MTS)
+    lerFita(&fita, branco);                                         // Lendo a fita de entrada
+    int result = simularMT(&estados, &fTransicao, &fita, branco);   // Simulando a MTS através da Máquina de Turing Universal (MTU)
+
     switch (result)
     {
-        case 1:
-        {
-            cout << "Palavra aceita (pertence a linguagem da MT)" << endl;
-            cout << "Fita ao final da execucao: ";
-            imprimirFita(fita);
-            break;
-        }
+    case 1:
+    {
+        cout << "Palavra aceita (pertence a linguagem da MT)" << endl;
+        cout << "Fita ao final da execucao: ";
+        imprimirFita(fita);
+        break;
+    }
 
-        case 0:
-        {
-            cout << "Palavra rejeitada (nao pertence a linguagem da MT)" << endl;
-            cout << "Fita ao final da execucao: ";
-            imprimirFita(fita);
-            break;
-        }
-        
-        case -1:
-        {
-            cout << "A maquina entrou em um possivel loop. Nao foi possivel retornar um resultado" << endl;
-            break;
-        }
+    case 0:
+    {
+        cout << "Palavra rejeitada (nao pertence a linguagem da MT)" << endl;
+        cout << "Fita ao final da execucao: ";
+        imprimirFita(fita);
+        break;
+    }
 
-        default:
-        {
-            cout << "Erro na execucao!!" << endl;
-            break;
-        }
+    case -1:
+    {
+        cout << "A maquina entrou em um possivel loop. Nao foi possivel retornar um resultado" << endl;
+        break;
+    }
+
+    default:
+    {
+        cout << "Erro na execucao!!" << endl;
+        break;
+    }
     }
 
     delete[] estados.first;
