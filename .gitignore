@@ -2,3 +2,5 @@
 .vscode/launch.json
 .vscode/settings.json
 output/executar.exe
+build/Debug/outDebug.exe
+build/Debug/executar.o
