@@ -102,6 +102,33 @@ estado encontrarEstado(pair<estado *, int> estados, string nomeEstado)
     return est;
 }
 
+// Verifica se o alfabeto da fita contém todos os símbolos do alfabeto de entrada
+bool verificarAlfabetoFita(string **alfabeto, string **alfabetoFita, int qtdSimbolosEntrada, int qtdSimbolosFita)
+{
+    // Verificando, para cada símbolo do alfabeto, se ele está presente no símbolo da fita
+    for(int i = 0; i < qtdSimbolosEntrada; i++)
+    {
+        bool simboloEncontrado = false;
+        
+        for(int j = 0; j < qtdSimbolosFita; j++)
+        {
+            if((*alfabeto)[i] == (*alfabetoFita)[j])
+            {
+                simboloEncontrado = true;
+                j = qtdSimbolosFita;
+                continue;
+            }
+        }
+
+        if(!simboloEncontrado)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 // Lê as informações da Máquina de Turing a ser simulada
 void lerMT(pair<estado *, int> *estados, string **alfabeto, string **alfabetoFita, pair<transicao *, int> *funcaoTransicao, string &branco)
 {
@@ -254,13 +281,24 @@ void lerMT(pair<estado *, int> *estados, string **alfabeto, string **alfabetoFit
     }
 
     // Lendo o alfabeto da fita
-    *alfabetoFita = new string[qtdSimbolosFita];
-    cout << "Simbolos do alfabeto da fita (incluindo o branco): ";
-    for (int i = 0; i < qtdSimbolosFita; i++)
+    while (true)
     {
-        string simbolo;
-        cin >> simbolo;
-        (*alfabetoFita)[i] = simbolo;
+        *alfabetoFita = new string[qtdSimbolosFita];
+        cout << "Simbolos do alfabeto da fita (incluindo o branco): ";
+        for (int i = 0; i < qtdSimbolosFita; i++)
+        {
+            string simbolo;
+            cin >> simbolo;
+            (*alfabetoFita)[i] = simbolo;
+        }
+
+        // Verificando se o alfabeto da fita contém todos os símbolos do alfabeto de entrada
+        if(verificarAlfabetoFita(alfabeto, alfabetoFita, qtdSimbolosEntrada, qtdSimbolosFita))
+        {
+            break;
+        }
+
+        cout << "Alfabeto da fita invalido! Deve conter todos os simbolos do alfabeto de entrada." << endl;
     }
 
     // Lendo o símbolo branco
@@ -492,24 +530,30 @@ int main()
     lerFita(&fita, branco);                                         // Lendo a fita de entrada
     int result = simularMT(&estados, &fTransicao, &fita, branco);   // Simulando a MTS através da Máquina de Turing Universal (MTU)
 
+    cout << endl
+         << "SAIDA: " << endl;
     switch (result)
     {
+    // Palavra aceita
     case 1:
     {
-        cout << "Palavra aceita (pertence a linguagem da MT)" << endl;
+        cout << "A Maquina de Turing parou em um estado de ACEITACAO." << endl;
+        cout << "A palavra de entrada pertence a linguagem da MT" << endl;
         cout << "Fita ao final da execucao: ";
         imprimirFita(fita);
         break;
     }
 
+    // Palavra rejeitada
     case 0:
     {
-        cout << "Palavra rejeitada (nao pertence a linguagem da MT)" << endl;
-        cout << "Fita ao final da execucao: ";
+        cout << "A Maquina de Turing parou em um estado de REJEICAO." << endl;
+        cout << "A palavra de entrada nao pertence a linguagem da MT" << endl;
         imprimirFita(fita);
         break;
     }
 
+    // MT entrou em loop
     case -1:
     {
         cout << "A maquina entrou em um possivel loop. Nao foi possivel retornar um resultado" << endl;
@@ -518,11 +562,12 @@ int main()
 
     default:
     {
-        cout << "Erro na execucao!!" << endl;
+        cout << "ERRO NA EXECUCAO!!" << endl;
         break;
     }
     }
 
+    // Deletando estruturas alocadas na memória
     delete[] estados.first;
     delete[] alfabeto;
     delete[] alfabetoFita;
