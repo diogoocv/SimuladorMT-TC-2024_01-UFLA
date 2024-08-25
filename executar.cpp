@@ -436,7 +436,7 @@ int simularMT(pair<estado *, int> *estados, pair<transicao *, int> *fTransicao, 
                         // Movendo para a direita
                         if (fTransicao->first[i].direcao == 'D')
                         {
-                            // Verificando se a Ccbeça de leitura/escrita será posicionada na última posição da fita
+                            // Verificando se a cabeça de l/e será posicionada na última posição da fita
                             if (posFita >= (*fita).second - 1)
                             {
                                 (*fita->first).push_back(branco); // Adicionando um símbolo branco ao final da fita
@@ -514,7 +514,6 @@ void imprimirFita(pair<vector<string> *, int> fita)
 
 int main()
 {
-    cout << "Iniciado" << endl;
     pair<estado *, int> estados;       // Par com o conjunto de estados (Q) e o seu tamanho (|Q|)
     string *alfabeto;                  // Alfabeto de entrada (∑)
     string *alfabetoFita;              // Alfabeto da fita (Γ)
