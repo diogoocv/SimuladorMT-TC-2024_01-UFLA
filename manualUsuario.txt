@@ -1,0 +1,52 @@
+Algoritmo para simular uma Máquina de Turing Universal utilizando a linguagem C++
+Diogo Oliveira Carvalho
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+Para utilizar o programa, devem ser informados os dados de uma Máquina de Turing Específica e uma fita de entrada, seguindo o padrão conforme o exemplo abaixo.
+OBS: as entradas são apenas os dados à esquerda da seta "->", enquanto as frases à direita dela são o seu significado.
+
+3           -> Quantidade de estados
+
+q0 q1 q2    -> Nome dos estados (Q), separados por um espaço
+
+q0          -> Nome do estado inicial
+
+q1 q2       -> Nome dos estados de aceitação e de rejeição, respectivamente, separados por um espaço
+
+2           -> Quantidade de símbolos do alfabeto de entrada
+
+0 1         -> Símbolos do alfabeto de entrada, separados por um espaço
+
+3           -> Quantidade de símbolos do alfabeto da fita (no mínimo o tamanho do alfabeto de entrada + 1, que será o símbolo branco)
+
+0 1 B       -> Símbolos do alfabeto da fita (incluindo branco), separados por um espaço
+
+B           -> Símbolo do alfabeto da fita que corresponde ao símbolo branco
+
+               Função de transição completa da MT (para cada estado não final, deve haver uma transição para cada símbolo da fita lido)
+               A função será lida na ordem em que foram digitados os estados nao finais e símbolos da fita 
+                    ex para 2 estados e 2 simbolos:
+                        1°_estado, 1°_simbolo -> digitar_transicao
+                        1°_estado, 2°_simbolo -> digitar_transicao
+                        2°_estado, 1°_simbolo -> digitar_transicao
+                        2°_estado, 2°_simbolo -> digitar_transicao
+               Digitar uma transição por vez no formato: estadoDestino simboloEscrito direcaoMovimento
+q0 1 D      -> (q0, 0) -> q0 1 D
+q2 0 D      -> (q0, 1) -> q2 0 D
+q1 B E      -> (q0, B) -> q1 B E
+
+4           -> Tamanho da fita de entrada (quantidade de símbolos escritos, excluindo os símbolos brancos)
+0 0 0 1     -> Símbolos da fita de entrada (desconsiderando branco), separdos por um espaço
+
+
+SAÍDA: 
+    Palavra rejeitada (nao pertence a linguagem da MT)
+    Fita ao final da execucao: 1 1 1 0 B
+
+Explicação da saída:
+    A MT do exemplo aceita palavras que contenham apenas símbolos 0 (e ao menos um 0)
+    Para cada símbolo diferente de branco, ela inverte o símbolo (0 para 1 ou 1 para 0)
+    Como a entrada foi "0 0 0 1", a palavra foi rejeitada, pois possui um símbolo 1 e não apenas 0's.
+--------------------------------------------------------------------------------------------------------------------------------------------
+
+
