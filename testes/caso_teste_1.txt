@@ -1,0 +1,50 @@
+Máquina de Turing aceitadora sobre a linguagem A = {w#w | w ∈ {0,1}*}
+
+Para utiliza-la, basta executar o programa (executar.cpp), copiar todos os dados abaixo até a entrada -1 (cuidado para nao copiar espaços em branco no inicio e fim) e colar no terminal da execucao. Depois, copiar uma das fitas descritas abaixo de "Fitas de entrada" e colar no terminal de execucao.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+10
+q1 q2 q3 q4 q5 q6 q7 q8 qA qR
+q1
+qA qR
+3
+0 1 #
+5
+0 1 # x B
+B
+q1 1 q3 x D
+q1 # q8 # D
+q1 0 q2 x D
+q2 0 q2 0 D
+q2 1 q2 1 D
+q2 # q4 # D
+q3 0 q3 0 D	
+q3 1 q3 1 D
+q3 # q5 # D
+q4 x q4 x D
+q4 0 q6 x E
+q5 x q5 x D
+q5 1 q6 x E
+q6 x q6 x E
+q6 # q7 # E
+q7 0 q7 0 E
+q7 1 q7 1 E
+q7 x q1 x D
+q8 x q8 x D
+q8 B qA B D
+-1
+
+
+Fitas de entrada
+
+9
+0 1 0 1 # 0 1 0 1	
+			-> Saida: A palavra de entrada pertence a linguagem da MT
+
+9
+0 0 0 0 # 1 1 1 1	
+			-> Saida: A palavra de entrada não pertence a linguagem da MT
+
+7		
+a b c # a b c		-> Saida: A palavra de entrada não pertence a linguagem da MT
+

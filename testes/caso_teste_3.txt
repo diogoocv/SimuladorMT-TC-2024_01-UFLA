@@ -1,0 +1,46 @@
+Máquina de Turing aceitadora sobre o alfabeto {0}* tal que o número de 0's é uma potência de 2.
+
+Para utiliza-la, basta executar o programa (executar.cpp), copiar todos os dados abaixo até a entrada -1 (cuidado para nao copiar espaços em branco no inicio e fim) e colar no terminal da execucao. Depois, copiar uma das fitas descritas abaixo de "Fitas de entrada" e colar no terminal de execucao.
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+7
+q1 q2 q3 q4 q5 qA qR
+q1
+qA qR
+1
+0
+3
+0 x B
+B
+q1 0 q2 B D
+q2 x q2 x D
+q2 B qA B D
+q2 0 q3 x D
+q3 x q3 x D
+q3 0 q4 0 D
+q3 B q5 B E
+q4 x q4 x D
+q4 0 q3 x D
+q5 0 q5 0 E
+q5 x q5 x E
+q5 B q2 B D
+-1
+
+
+Fitas de entrada
+
+1
+0
+			-> Saida: A palavra de entrada pertence a linguagem da MT
+
+2
+0 0
+			-> Saida: A palavra de entrada pertence a linguagem da MT
+
+4
+0 0 0 0
+			-> Saida: A palavra de entrada pertence a linguagem da MT
+
+11
+0 0 0 0 0 0 0 0 0 0 0
+			-> Saida: A palavra de entrada não pertence a linguagem da MT
