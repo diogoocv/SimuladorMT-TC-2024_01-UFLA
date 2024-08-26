@@ -106,13 +106,13 @@ estado encontrarEstado(pair<estado *, int> estados, string nomeEstado)
 bool verificarAlfabetoFita(string **alfabeto, string **alfabetoFita, int qtdSimbolosEntrada, int qtdSimbolosFita)
 {
     // Verificando, para cada símbolo do alfabeto, se ele está presente no símbolo da fita
-    for(int i = 0; i < qtdSimbolosEntrada; i++)
+    for (int i = 0; i < qtdSimbolosEntrada; i++)
     {
         bool simboloEncontrado = false;
-        
-        for(int j = 0; j < qtdSimbolosFita; j++)
+
+        for (int j = 0; j < qtdSimbolosFita; j++)
         {
-            if((*alfabeto)[i] == (*alfabetoFita)[j])
+            if ((*alfabeto)[i] == (*alfabetoFita)[j])
             {
                 simboloEncontrado = true;
                 j = qtdSimbolosFita;
@@ -120,7 +120,7 @@ bool verificarAlfabetoFita(string **alfabeto, string **alfabetoFita, int qtdSimb
             }
         }
 
-        if(!simboloEncontrado)
+        if (!simboloEncontrado)
         {
             return false;
         }
@@ -293,7 +293,7 @@ void lerMT(pair<estado *, int> *estados, string **alfabeto, string **alfabetoFit
         }
 
         // Verificando se o alfabeto da fita contém todos os símbolos do alfabeto de entrada
-        if(verificarAlfabetoFita(alfabeto, alfabetoFita, qtdSimbolosEntrada, qtdSimbolosFita))
+        if (verificarAlfabetoFita(alfabeto, alfabetoFita, qtdSimbolosEntrada, qtdSimbolosFita))
         {
             break;
         }
@@ -487,7 +487,7 @@ int simularMT(pair<estado *, int> *estados, pair<transicao *, int> *fTransicao, 
         if (contIteracoes > LOOP)
         {
             char op;
-            cout << "A maquina de Turing pode ter entrado em loop. Deseja continuou? (S / N)";
+            cout << "A maquina de Turing pode ter entrado em loop. Deseja continuar? " << endl << "(S/N): ";
             cin >> op;
 
             if (op != 's' and op != 'S')
@@ -526,45 +526,61 @@ int main()
     cout << "Simulador de Maquina de Turing Universal" << endl;
 
     lerMT(&estados, &alfabeto, &alfabetoFita, &fTransicao, branco); // Lendo a Máquina de Turing Específica (MTS)
-    lerFita(&fita, branco);                                         // Lendo a fita de entrada
-    int result = simularMT(&estados, &fTransicao, &fita, branco);   // Simulando a MTS através da Máquina de Turing Universal (MTU)
 
-    cout << endl
-         << "SAIDA: " << endl;
-    switch (result)
+    // Lendo fitas de entrada e simulando a MT com elas até que o usuário deseje finalizar o sistema
+    while (true)
     {
-    // Palavra aceita
-    case 1:
-    {
-        cout << "A Maquina de Turing parou em um estado de ACEITACAO." << endl;
-        cout << "A palavra de entrada pertence a linguagem da MT" << endl;
-        cout << "Fita ao final da execucao: ";
-        imprimirFita(fita);
-        break;
+        lerFita(&fita, branco);                                       // Lendo a fita de entrada
+        int result = simularMT(&estados, &fTransicao, &fita, branco); // Simulando a MTS através da Máquina de Turing Universal (MTU)
+
+        cout << endl << "SAIDA: " << endl;
+        switch (result)
+        {
+        // Palavra aceita
+        case 1:
+        {
+            cout << "A Maquina de Turing parou em um estado de ACEITACAO." << endl;
+            cout << "A palavra de entrada pertence a linguagem da MT" << endl;
+            cout << "Fita ao final da execucao: ";
+            imprimirFita(fita);
+            break;
+        }
+
+        // Palavra rejeitada
+        case 0:
+        {
+            cout << "A Maquina de Turing parou em um estado de REJEICAO." << endl;
+            cout << "A palavra de entrada nao pertence a linguagem da MT" << endl;
+            imprimirFita(fita);
+            break;
+        }
+
+        // MT entrou em loop
+        case -1:
+        {
+            cout << "A maquina entrou em um possivel loop. Nao foi possivel retornar um resultado" << endl;
+            break;
+        }
+
+        default:
+        {
+            cout << "ERRO NA EXECUCAO!!" << endl;
+            break;
+        }
+
+        }
+        
+        char op;
+        cout << "Deseja executar a MT com outra fita de entrada? " << endl << "(S/N): ";
+        cin >> op;
+
+        if(op != 'S' and op != 's')
+        {
+            break;  // Programa finalizado
+        }
     }
 
-    // Palavra rejeitada
-    case 0:
-    {
-        cout << "A Maquina de Turing parou em um estado de REJEICAO." << endl;
-        cout << "A palavra de entrada nao pertence a linguagem da MT" << endl;
-        imprimirFita(fita);
-        break;
-    }
-
-    // MT entrou em loop
-    case -1:
-    {
-        cout << "A maquina entrou em um possivel loop. Nao foi possivel retornar um resultado" << endl;
-        break;
-    }
-
-    default:
-    {
-        cout << "ERRO NA EXECUCAO!!" << endl;
-        break;
-    }
-    }
+    cout << "Programa finalizado!" << endl;
 
     // Deletando estruturas alocadas na memória
     delete[] estados.first;
