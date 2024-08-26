@@ -5,43 +5,45 @@ Diogo Oliveira Carvalho
 Para utilizar o programa, devem ser informados os dados de uma Máquina de Turing Específica e uma fita de entrada, seguindo o padrão conforme o exemplo abaixo.
 OBS: as entradas são apenas os dados mais à esquerda, enquanto as frases mais à direita são o seu significado.
 
-3           -> Quantidade de estados
+3               -> Quantidade de estados
 
-q0 q1 q2    -> Nome dos estados (Q), separados por um espaço
+q0 q1 q2        -> Nome dos estados (Q), separados por um espaço
 
-q0          -> Nome do estado inicial
+q0              -> Nome do estado inicial
 
-q1 q2       -> Nome dos estados de aceitação e de rejeição, respectivamente, separados por um espaço
+q1 q2           -> Nome dos estados de aceitação e de rejeição, respectivamente, separados por um espaço
 
-2           -> Quantidade de símbolos do alfabeto de entrada
+2               -> Quantidade de símbolos do alfabeto de entrada
 
-0 1         -> Símbolos do alfabeto de entrada, separados por um espaço
+0 1             -> Símbolos do alfabeto de entrada, separados por um espaço
 
-3           -> Quantidade de símbolos do alfabeto da fita (no mínimo o tamanho do alfabeto de entrada + 1, que será o símbolo branco)
+3               -> Quantidade de símbolos do alfabeto da fita (no mínimo o tamanho do alfabeto de entrada + 1, que será o símbolo branco)
 
-0 1 B       -> Símbolos do alfabeto da fita (incluindo branco), separados por um espaço
+0 1 B           -> Símbolos do alfabeto da fita (incluindo branco), separados por um espaço
 
-B           -> Símbolo do alfabeto da fita que corresponde ao símbolo branco
+B               -> Símbolo do alfabeto da fita que corresponde ao símbolo branco
 
-               Função de transição completa da MT (para cada estado não final, deve haver uma transição para cada símbolo da fita lido)
-               A função será lida na ordem em que foram digitados os estados nao finais e os símbolos da fita 
-                    ex para 2 estados e 2 simbolos:
-                        1°_estado_digitado, 1°_simbolo_digitado ---> digitar_transicao
-                        1°_estado_digitado, 2°_simbolo_digitado ---> digitar_transicao
-                        2°_estado_digitado, 1°_simbolo_digitado ---> digitar_transicao
-                        2°_estado_digitado, 2°_simbolo_digitado ---> digitar_transicao
-               Digitar uma transição por vez no formato: estadoDestino simbolo_a_ser_escrito_na_fita direcaoMovimento
-q0 1 D      -> (q0, 0) ---> q0 1 D
-q2 0 D      -> (q0, 1) ---> q2 0 D
-q1 B E      -> (q0, B) ---> q1 B E
+                 Função de transição da MT
+                 Digitar uma transição por linha no formato: estadoAtual simbolo_lido_na_fita estadoDestino simbolo_a_ser_escrito_na_fita direcaoMovimento(E ou D)
+q0 0 q0 1 D     -> q0(estado Atual) 0(simbolo lido na fita) q0(estado de destino) 1(simbolo que será escrito na fita) D(movimento para a direita)
+q0 1 q2 0 D     -> 
+q0 B q1 B E     -> 
 
-4           -> Tamanho da fita de entrada (quantidade de símbolos escritos, excluindo os símbolos brancos)
-0 0 0 1     -> Símbolos da fita de entrada (desconsiderando branco), separdos por um espaço
+4               -> Tamanho da fita de entrada (quantidade de símbolos escritos, excluindo os símbolos brancos)
+
+0 0 0 1         -> Símbolos da fita de entrada (desconsiderando branco), separdos por um espaço
 
 
 SAÍDA: 
-    Palavra rejeitada (nao pertence a linguagem da MT)
+    A Maquina de Turing parou em um estado de REJEICAO.
+    A palavra de entrada nao pertence a linguagem da MT
     Fita ao final da execucao: 1 1 1 0 B
+    
+    Deseja executar a MT com outra fita de entrada? 
+    (S/N):
+
+N           -> A letra N indica que o programa não irá continuar executando a MT com outras fitas de entrada
+            -> Caso deseje continuar e informar outra fita, digite a letra S
 
 Explicação da saída:
     A MT do exemplo aceita palavras que contenham apenas símbolos 0 (e ao menos um 0)
