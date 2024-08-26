@@ -452,17 +452,17 @@ int simularMT(pair<estado *, int> *estados, pair<vector<transicao> *, int> *fTra
                         estadoAtual = (*fTransicao->first)[i].estadoDestino;           // Indo para o estado de destino da transição
                         (*fita->first)[posFita] = (*fTransicao->first)[i].novoSimbolo; // Escrevendo na fita o novo símbolo da transição
 
+                        // Verificando se a cabeça de l/e será posicionada na penúltima posição da fita
+                        if (posFita >= (*fita).second - 1)
+                        {
+                            (*fita->first).push_back(branco); // Adicionando um símbolo branco ao final da fita
+                            (*fita).second++;                 // Incrementando o tamanho da fita
+                        }
+
                         // Atualizando a posição da cabeça de leitura e escrita
                         // Movendo para a direita
                         if ((*fTransicao->first)[i].direcao == 'D')
                         {
-                            // Verificando se a cabeça de l/e será posicionada na última posição da fita
-                            if (posFita >= (*fita).second - 1)
-                            {
-                                (*fita->first).push_back(branco); // Adicionando um símbolo branco ao final da fita
-                                (*fita).second++;                 // Incrementando o tamanho da fita
-                            }
-
                             posFita++; // Posicionando a cabeça de l/e uma posição à direita
                         }
                         // Tentando mover para a esquerda
@@ -593,7 +593,7 @@ int main()
         }
 
         char op;
-        cout << "Deseja executar a MT com outra fita de entrada? " << endl
+        cout << endl << "Deseja executar a MT com outra fita de entrada? " << endl
              << "(S/N): ";
         cin >> op;
 
